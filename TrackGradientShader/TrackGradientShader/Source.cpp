@@ -115,7 +115,7 @@ bool PopulateVector_Gradient(const string filename, vector<int>& v)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Bay(const Point& p1, const Point& p2, const RGBApixel& color)
+void Paint_Bresenham(const Point& p1, const Point& p2, const RGBApixel& color)
 {
   int x0 = p1.x;
   int y0 = p1.y;
@@ -158,7 +158,7 @@ void ShadeTrackV1(vector<Point>& v1, vector<Point>& v2, vector<int> gradient)
     const int greyval = gradient[(i / v1Size) * gradientLength];
     const RGBApixel colour = { greyval, greyval, greyval, 0 };
     //const RGBApixel colour = { rand() % 255, rand() % 255, rand() % 255, 0 };
-    Bay(v1[i], v2[i], colour);
+    Paint_Bresenham(v1[i], v2[i], colour);
   }
 }
 
@@ -195,7 +195,7 @@ void ShadeTrackV2(vector<Point>& v1, vector<Point>& v2, vector<int> gradient)
       }
     }
 
-    Bay(p1, v2[p2Index], colour);
+    Paint_Bresenham(p1, v2[p2Index], colour);
   }
 }
 
@@ -244,7 +244,7 @@ void ShadeTrackV3(vector<Point>& v1, vector<Point>& v2, vector<int> gradient)
 
     for (auto pe : drawablePoints)
     {
-      Bay(p1, pe, colour);
+      Paint_Bresenham(p1, pe, colour);
     }
 
     const int percentage = (++totalPointsProcessed / totalPointsCount) * 100;
