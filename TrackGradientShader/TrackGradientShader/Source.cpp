@@ -13,9 +13,11 @@ using namespace std;
 const int samples = 1000;
 const double thresh = 0.05;
 
-const char* kFile1 = "1.txt";
-const char* kFile2 = "2.txt";
-const char* kFileGradient = "gradient.txt";
+string file1 = "1.txt";
+string file2 = "2.txt";
+string fileGradient = "gradient.txt";
+
+const int tickCount = GetTickCount64();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -336,17 +338,38 @@ void SetGroundLevel()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void main()
+int main(const int argc, char* argv[])
 {
+  //AL.
+  //For debugging!
+  #ifdef _DEBUG
+  MessageBox(nullptr, L"Attach", L"", 0);
+  #endif
+  for (int i = 0; i < argc; ++i)
+  {
+    cout << argv[i] << "\n";
+  }
+  cout << "\nShading Heightmap...\n";
+  //
+
+  if (argc > 1)
+  {
+    const string trackPath = argv[1];
+    file1 = trackPath + "//" + file1;
+    file2 = trackPath + "//" + file2;
+    const string gradientPath = argv[2];
+    fileGradient = gradientPath + "//" + fileGradient;
+  }
+
   vector<Point> v1, v2;
   vector<int> gradient;
 
-  PopulateVector_Points(kFile1, v1);
-  PopulateVector_Points(kFile2, v2);
+  PopulateVector_Points(file1, v1);
+  PopulateVector_Points(file2, v2);
 
   totalPointsCount = v1.size() + v2.size();
 
-  PopulateVector_Gradient(kFileGradient, gradient);
+  PopulateVector_Gradient(fileGradient, gradient);
   
   canvas.SetSize(max_x + 10, max_y + 10);
 
@@ -361,9 +384,11 @@ void main()
   cout << "\nSETTING GROUND LEVEL TO BLACK...\n";
   SetGroundLevel();
 
-  string filename = to_string(GetTickCount()) + ".bmp";
+  string filename = to_string(tickCount) + ".bmp";
   cout << "\nSaving to file: " << filename << "\n";
   canvas.WriteToFile(filename.c_str());
+
+  return tickCount;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
