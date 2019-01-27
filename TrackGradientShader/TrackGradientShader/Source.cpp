@@ -338,6 +338,21 @@ void SetGroundLevel()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void ShowError(string fileName)
+{
+  wstring msg = L"Could not find : ";
+  msg += wstring(fileName.begin(), fileName.end());
+
+  MessageBox(
+    nullptr,
+    msg.c_str(),
+    L"Error",
+    MB_ICONEXCLAMATION
+  );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 int main(const int argc, char* argv[])
 {
   //AL.
@@ -364,19 +379,32 @@ int main(const int argc, char* argv[])
   vector<Point> v1, v2;
   vector<int> gradient;
 
-  PopulateVector_Points(file1, v1);
-  PopulateVector_Points(file2, v2);
+  if (PopulateVector_Points(file1, v1) == false)
+  {
+    ShowError(file1);
+    return -1;
+  }
 
+  if (PopulateVector_Points(file2, v2) == false)
+  {
+    ShowError(file2);
+    return -1;
+  }
+
+  if (PopulateVector_Gradient(fileGradient, gradient) == false)
+  {
+    ShowError(fileGradient);
+    return -1;
+  }
+  
   totalPointsCount = v1.size() + v2.size();
 
-  PopulateVector_Gradient(fileGradient, gradient);
-  
   canvas.SetSize(max_x + 10, max_y + 10);
 
   ShadeTrackV3(v1, v2, gradient);
   ShadeTrackV3(v2, v1, gradient);
 
-  cout << "\nPLEAE WAIT...\n";
+  cout << "\nPLEASE WAIT...\n";
 
   cout << "\nFILLING IN WHITE GAPS...\n";
   FillInGaps();
