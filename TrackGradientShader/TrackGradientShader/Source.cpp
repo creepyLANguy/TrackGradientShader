@@ -17,7 +17,7 @@ string file1 = "1.txt";
 string file2 = "2.txt";
 string fileGradient = "gradient.txt";
 
-const int tickCount = GetTickCount64();
+const int paddingMargin = 10; //padding from track edge to border.
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -84,6 +84,20 @@ bool PopulateVector_Points(const string filename, vector<Point>& v)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void AdjustPointsForPaddingAndSquareDimensions(vector<Point>& v, const int maxDim)
+{
+  const int adjust_x = abs(max_x - maxDim)/2 + paddingMargin;
+  const int adjust_y = abs(max_y - maxDim)/2 + paddingMargin;
+
+  for (Point& p : v)
+  {
+    p.x += adjust_x;
+    p.y += adjust_y;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 bool PopulateVector_Gradient(const string filename, vector<int>& v)
 {
   ifstream fileio;
@@ -110,8 +124,6 @@ bool PopulateVector_Gradient(const string filename, vector<int>& v)
   fileio.close();
   return true;
 }
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -199,6 +211,7 @@ void ShadeTrackV2(vector<Point>& v1, vector<Point>& v2, vector<int> gradient)
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
 
 void ShadeTrackV3(vector<Point>& v1, vector<Point>& v2, vector<int> gradient)
 {
@@ -399,7 +412,11 @@ int main(const int argc, char* argv[])
   
   totalPointsCount = v1.size() + v2.size();
 
-  canvas.SetSize(max_x + 10, max_y + 10);
+  const int maxDim = max(max_x, max_y);
+  canvas.SetSize(maxDim + (paddingMargin * 2), maxDim + (paddingMargin * 2));
+
+  AdjustPointsForPaddingAndSquareDimensions(v1, maxDim);
+  AdjustPointsForPaddingAndSquareDimensions(v2, maxDim);
 
   ShadeTrackV3(v1, v2, gradient);
   ShadeTrackV3(v2, v1, gradient);
@@ -412,6 +429,8 @@ int main(const int argc, char* argv[])
   cout << "\nSETTING GROUND LEVEL TO BLACK...\n";
   SetGroundLevel();
 
+
+  const int tickCount = abs(static_cast<int>(GetTickCount()));
   string filename = to_string(tickCount) + ".bmp";
   cout << "\nSaving to file: " << filename << "\n";
   canvas.WriteToFile(filename.c_str());
