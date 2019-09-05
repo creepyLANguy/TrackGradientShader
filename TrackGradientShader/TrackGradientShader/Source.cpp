@@ -331,6 +331,62 @@ void FillInGaps()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+inline bool AllAreTheSameColour(vector<RGBApixel>& v)
+{
+  const auto starter = v.front();
+  //const int colour = starter.Red + starter.Green + starter.Blue;
+
+  for (auto p : v)
+  {
+    //const int currentColour = p.Red + p.Green + p.Blue;
+    //if (currentColour != colour)
+    if (p.Red != starter.Red)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void RectifyIslandedAnomalies()
+{
+  for (int x = 1; x < canvas.TellWidth() - 1; ++x)
+  {
+    for (int y = 1; y < canvas.TellHeight() - 1; ++y)
+    {
+      const RGBApixel p = canvas.GetPixel(x, y);
+
+      vector<RGBApixel> neighbours =
+      {
+        canvas.GetPixel(x, y - 1),
+        canvas.GetPixel(x, y + 1),
+        canvas.GetPixel(x - 1, y),
+        canvas.GetPixel(x + 1, y),
+        canvas.GetPixel(x - 1, y - 1),
+        canvas.GetPixel(x + 1, y + 1),
+        canvas.GetPixel(x - 1, y + 1),
+        canvas.GetPixel(x + 1, y - 1)
+      };
+
+      if (AllAreTheSameColour(neighbours) == false)
+      {
+        continue;
+      }
+
+      if (p.Red == neighbours.front().Red)
+      {
+        continue;
+      }
+
+      canvas.SetPixel(x, y, neighbours.front());
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void SetGroundLevel()
 {
   const RGBApixel black = { 0 };
@@ -425,6 +481,9 @@ int main(const int argc, char* argv[])
 
   cout << "\nFILLING IN WHITE GAPS...\n";
   FillInGaps();
+
+  cout << "\nRECTIFYING ISLANDED ANOMALIES...\n";
+  RectifyIslandedAnomalies();
 
   cout << "\nSETTING GROUND LEVEL TO BLACK...\n";
   SetGroundLevel();
